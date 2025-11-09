@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Conecta Bairros</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <div id="login-form-container">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label>Email: <input type_2="email" name="email" required></label>
+                <label>Senha: <input type_2="password" name="senha" required></label>
+                <button type="submit">Entrar</button>
+            </form>
+            <p>Não tem conta? <a href_2="#" id="showRegister">Cadastre-se</a></p>
+        </div>
+
+        <div id="register-form-container" style="display: none;">
+            <h2>Cadastro</h2>
+            <form id="registerForm">
+                <label>Nome: <input type="text" name="nome" required></label>
+                <label>Email: <input type="email" name="email" required></label>
+                <label>Senha: <input type="password" name="senha" required></label>
+                <label>Endereço: <input type="text" name="endereco"></label>
+                
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="tipoUsuario" value="VOLUNTARIO" checked>
+                        Sou Voluntário
+                    </label>
+                    <label>
+                        <input type="radio" name="tipoUsuario" value="ORGANIZACAO">
+                        Sou Organização
+                    </label>
+                </div>
+
+                <label id="cnpj-field" style="display: none;">
+                    CNPJ: <input type="text" name="cnpj">
+                </label>
+
+                <button type="submit">Cadastrar</button>
+            </form>
+            <p>Já tem conta? <a href_2="#" id="showLogin">Faça Login</a></p>
+        </div>
+    </div>
+
+    <script type="module" src="login.js"></script>
+</body>
+</html>

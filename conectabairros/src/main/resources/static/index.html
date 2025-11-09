@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Conecta Bairros</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h2 id="welcome-header"></h2>
+            <button id="logout-btn">Sair</button>
+        </header>
+
+        <hr>
+
+        <div id="organizacao-section" class="app-section" style="display: none;">
+            <h3>Cadastrar Nova Atividade</h3>
+            <form id="atividadeForm">
+                <label>Título: <input type="text" name="titulo" required></label>
+                <label>Descrição: <input type="text" name="descricao"></label>
+                <label>Tipo:
+                    <select name="tipo" required>
+                        <option value="SOCIAL">Social</option>
+                        <option value="AMBIENTAL">Ambiental</option>
+                        <option value="EDUCACIONAL">Educacional</option>
+                    </select>
+                </label>
+                <label>Data: <input type="date" name="data" required></label>
+                <label>Local: <input type="text" name="local"></label>
+                <label>Vagas Disponíveis: <input type="number" name="vagasDisponiveis" required></label>
+                <button type="submit">Cadastrar Atividade</button>
+            </form>
+        </div>
+
+        <div id="voluntario-section" class="app-section" style="display: none;">
+            <h3>Minhas Inscrições</h3>
+            <ul id="minhas-inscricoes-lista">
+                </ul>
+        </div>
+        
+        <hr>
+
+        <div class="app-section">
+            <h3>Todas as Atividades</h3>
+            <table id="atividadesTable">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Descrição</th>
+                        <th>Tipo</th>
+                        <th>Data</th>
+                        <th>Local</th>
+                        <th>Vagas</th>
+                        <th>Organização</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="atividadesTbody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module" src="index.js"></script>
+</body>
+</html>

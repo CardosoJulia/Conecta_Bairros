@@ -1,5 +1,7 @@
 package com.conecta_bairros.conectabairros.model;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,16 @@ import lombok.NoArgsConstructor;
 @DiscriminatorColumn(name = "tipo_usuario", discriminatorType = DiscriminatorType.STRING)
 @Data
 @NoArgsConstructor
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "tipo_usuario", // O nome exato do campo que o JS espera!
+        visible = true
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Voluntario.class, name = "VOLUNTARIO"),
+        @JsonSubTypes.Type(value = Organizacao.class, name = "ORGANIZACAO")
+})
 public abstract class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
