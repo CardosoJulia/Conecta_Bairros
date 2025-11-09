@@ -1,56 +1,45 @@
-import { getAtividades, getInscricoes, createAtividade, inscrever } from './api.js';
+import { getAtividades, getInscricoes, createAtividade, inscrever } from './api.js'
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Verificar autenticação
-    const usuarioString = localStorage.getItem('usuario');
+    const usuarioString = localStorage.getItem('usuario')
     if (!usuarioString) {
-        // Se não tiver usuário, chuta ele de volta pro login
-        window.location.href = 'login.html';
-        return;
+        window.location.href = 'login.html'
+        return
     }
 
-    const usuario = JSON.parse(usuarioString);
-    const { id: userId, nome: userName, tipoUsuario: userType } = usuario;
+    const usuario = JSON.parse(usuarioString)
+    const { id: userId, nome: userName, tipoUsuario: userType } = usuario
 
-    // Elementos da UI
-    const welcomeHeader = document.getElementById('welcome-header');
-    const logoutBtn = document.getElementById('logout-btn');
+    const welcomeHeader = document.getElementById('welcome-header')
+    const logoutBtn = document.getElementById('logout-btn')
     
-    const orgSection = document.getElementById('organizacao-section');
-    const volSection = document.getElementById('voluntario-section');
+    const orgSection = document.getElementById('organizacao-section')
+    const volSection = document.getElementById('voluntario-section')
     
-    const atividadeForm = document.getElementById('atividadeForm');
-    const atividadesTbody = document.getElementById('atividadesTbody');
-    const minhasInscricoesLista = document.getElementById('minhas-inscricoes-lista');
+    const atividadeForm = document.getElementById('atividadeForm')
+    const atividadesTbody = document.getElementById('atividadesTbody')
+    const minhasInscricoesLista = document.getElementById('minhas-inscricoes-lista')
 
-    // 2. Configurar UI inicial
-    welcomeHeader.textContent = `Bem-vindo(a), ${userName}! (${userType})`;
+    welcomeHeader.textContent = `Bem-vindo(a), ${userName}! (${userType})`
 
     logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('usuario');
-        window.location.href = 'login.html';
-    });
+        localStorage.removeItem('usuario')
+        window.location.href = 'login.html'
+    })
 
-    // 3. Funções de carregamento de dados
-    
-    /**
-     * Carrega e exibe todas as atividades na tabela principal
-     */
     async function loadAllAtividades() {
         try {
-            const atividades = await getAtividades();
-            atividadesTbody.innerHTML = ''; // Limpa tabela
+            const atividades = await getAtividades()
+            atividadesTbody.innerHTML = ''
 
             atividades.forEach(a => {
-                const tr = document.createElement('tr');
+                const tr = document.createElement('tr')
                 
-                // Coluna de Ação (Botão)
-                let acaoBtn = '';
+                let acaoBtn = ''
                 if (userType === 'VOLUNTARIO') {
-                    // TODO: Adicionar lógica para não mostrar botão se já estiver inscrito
-                    acaoBtn = `<button class="inscrever-btn" data-atividade-id="${a.id}">Inscrever-se</button>`;
+                    acaoBtn = `<button class="inscrever-btn" data-atividade-id="${a.id}">Inscrever-se</button>`
                 } else {
-                    acaoBtn = 'N/A';
+                    acaoBtn = 'N/A'
                 }
 
                 tr.innerHTML = `
@@ -61,82 +50,66 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${a.local}</td>
                     <td>${a.vagasDisponiveis}</td>
                     <td>${a.nomeOrganizacao || 'N/A'}</td> <td>${acaoBtn}</td>
-                `;
-                atividadesTbody.appendChild(tr);
-            });
+                `
+                atividadesTbody.appendChild(tr)
+            })
             
-            // Adiciona listeners aos botões de inscrição
-            addInscreverListeners();
+            addInscreverListeners()
 
         } catch (error) {
-            console.error('Erro ao carregar atividades:', error);
-            atividadesTbody.innerHTML = '<tr><td colspan="8">Erro ao carregar atividades.</td></tr>';
+            console.error('Erro ao carregar atividades:', error)
+            atividadesTbody.innerHTML = '<tr><td colspan="8">Erro ao carregar atividades.</td></tr>'
         }
     }
 
-    /**
-     * Carrega e exibe as inscrições do voluntário
-     */
     async function loadMinhasInscricoes() {
         try {
-            const inscricoes = await getInscricoes(userId);
-            minhasInscricoesLista.innerHTML = ''; // Limpa lista
+            const inscricoes = await getInscricoes(userId)
+            minhasInscricoesLista.innerHTML = ''
 
             if (inscricoes.length === 0) {
-                minhasInscricoesLista.innerHTML = '<li>Você não está inscrito em nenhuma atividade.</li>';
-                return;
+                minhasInscricoesLista.innerHTML = '<li>Você não está inscrito em nenhuma atividade.</li>'
+                return
             }
 
             inscricoes.forEach(i => {
-                const li = document.createElement('li');
-                // O backend não manda o nome da atividade no /inscricoes, o que é ruim.
-                // Idealmente, o backend deveria mandar mais detalhes.
-                // Por agora, vamos mostrar o ID.
-                li.textContent = `Inscrição ID: ${i.id} (Atividade ID: ${i.atividade.id}) - Data: ${new Date(i.dataInscricao).toLocaleString('pt-BR')}`;
-                minhasInscricoesLista.appendChild(li);
-            });
+                const li = document.createElement('li')
+                li.textContent = `Inscrição ID: ${i.id} (Atividade ID: ${i.atividade.id}) - Data: ${new Date(i.dataInscricao).toLocaleString('pt-BR')}`
+                minhasInscricoesLista.appendChild(li)
+            })
 
         } catch (error) {
-            console.error('Erro ao carregar inscrições:', error);
-            minhasInscricoesLista.innerHTML = '<li>Erro ao carregar suas inscrições.</li>';
+            console.error('Erro ao carregar inscrições:', error)
+            minhasInscricoesLista.innerHTML = '<li>Erro ao carregar suas inscrições.</li>'
         }
     }
 
-    // 4. Handlers de Eventos
-
-    /**
-     * Adiciona listeners aos botões "Inscrever-se" na tabela
-     */
     function addInscreverListeners() {
         document.querySelectorAll('.inscrever-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
-                const atividadeId = e.target.dataset.atividadeId;
+                const atividadeId = e.target.dataset.atividadeId
                 
                 if (!confirm(`Confirmar inscrição na atividade ID ${atividadeId}?`)) {
-                    return;
+                    return
                 }
                 
                 try {
-                    await inscrever(userId, atividadeId);
-                    alert('Inscrição realizada com sucesso!');
-                    // Recarrega atividades (para atualizar vagas) e minhas inscrições
-                    loadAllAtividades();
+                    await inscrever(userId, atividadeId)
+                    alert('Inscrição realizada com sucesso!')
+                    loadAllAtividades()
                     if (userType === 'VOLUNTARIO') {
-                        loadMinhasInscricoes();
+                        loadMinhasInscricoes()
                     }
                 } catch (error) {
-                    alert(`Erro ao inscrever: ${error.message}`);
-                    console.error(error);
+                    alert(`Erro ao inscrever: ${error.message}`)
+                    console.error(error)
                 }
-            });
-        });
+            })
+        })
     }
 
-    /**
-     * Handler para o form de criar atividade (Organização)
-     */
     atividadeForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+        e.preventDefault()
         
         const dados = {
             titulo: e.target.titulo.value,
@@ -145,31 +118,27 @@ document.addEventListener('DOMContentLoaded', () => {
             data: e.target.data.value,
             local: e.target.local.value,
             vagasDisponiveis: parseInt(e.target.vagasDisponiveis.value)
-        };
+        }
         
-        // O ID da organização vem do usuário logado
-        const organizacaoId = userId;
+        const organizacaoId = userId
 
         try {
-            await createAtividade(dados, organizacaoId);
-            alert('Atividade cadastrada com sucesso!');
-            e.target.reset();
-            loadAllAtividades(); // Atualiza a tabela
+            await createAtividade(dados, organizacaoId)
+            alert('Atividade cadastrada com sucesso!')
+            e.target.reset()
+            loadAllAtividades()
         } catch (error) {
-            alert(`Erro ao cadastrar atividade: ${error.message}`);
-            console.error(error);
+            alert(`Erro ao cadastrar atividade: ${error.message}`)
+            console.error(error)
         }
-    });
+    })
 
-
-    // 5. Execução inicial (Lógica condicional)
-    
-    loadAllAtividades(); // Todos veem as atividades
+    loadAllAtividades()
 
     if (userType === 'VOLUNTARIO') {
-        volSection.style.display = 'block';
-        loadMinhasInscricoes();
+        volSection.style.display = 'block'
+        loadMinhasInscricoes()
     } else if (userType === 'ORGANIZACAO') {
-        orgSection.style.display = 'block';
+        orgSection.style.display = 'block'
     }
-});
+})

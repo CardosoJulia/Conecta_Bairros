@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const showLoginBtn = document.getElementById('showLogin');
     
     const cnpjField = document.getElementById('cnpj-field');
-    const tipoUsuarioRadios = document.querySelectorAll('input[name="tipoUsuario"]');
+    
+    const tipoUsuarioRadios = document.querySelectorAll('input[name="tipo_usuario"]');
 
     // Alternar entre forms
     showRegisterBtn.addEventListener('click', (e) => {
@@ -26,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginContainer.style.display = 'block';
     });
 
-    // Mostrar/Esconder campo CNPJ
+    // Mostrar/Esconder campo CNPJ 
     tipoUsuarioRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
             if (e.target.value === 'ORGANIZACAO') {
@@ -46,15 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const usuario = await login(email, senha);
             
-            // Salva os dados do usuário no localStorage
             localStorage.setItem('usuario', JSON.stringify({
                 id: usuario.id,
                 nome: usuario.nome,
-                tipoUsuario: usuario.tipo_usuario // Cuidado: o backend manda "tipo_usuario"
+                tipoUsuario: usuario.tipo_usuario
             }));
 
-            // Redireciona para o app
-            window.location.href = 'app.html';
+            window.location.href = 'index.html'; 
 
         } catch (error) {
             alert(`Erro no login: ${error.message}. Verifique email e senha.`);
@@ -65,18 +64,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle Register
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
+
+        const data = {
+            nome: e.target.nome.value,
+            email: e.target.email.value,
+            senha: e.target.senha.value,
+            endereco: e.target.endereco.value,
+            cnpj: e.target.cnpj.value,
+            tipo_usuario: document.querySelector('input[name="tipo_usuario"]:checked').value
+        };
+
+        if (data.tipo_usuario === 'VOLUNTARIO') {
+            data.cnpj = null; // Limpa o CNPJ se for voluntário
+        }
 
         try {
-            if (data.tipoUsuario === 'VOLUNTARIO') {
+            if (data.tipo_usuario === 'VOLUNTARIO') {
                 await registerVoluntario(data);
             } else {
                 await registerOrganizacao(data);
             }
             
             alert('Cadastro realizado com sucesso! Faça o login.');
-            // Reseta o form e volta pro login
             e.target.reset();
             cnpjField.style.display = 'none';
             showLoginBtn.click();
